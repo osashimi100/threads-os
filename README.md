@@ -209,6 +209,47 @@ Unregister-ScheduledTask -TaskName "ThreadsAutoPost" -Confirm:$false
 
 ---
 
+## apps/career-diagnosis — 転職タイプ診断LP
+
+GitHub Pagesで公開中のLP。第二新卒・フリーター・既卒向け転職タイプ診断ツール。
+
+**公開URL：** `https://ren-os.github.io/threads-os/career-diagnosis/`
+
+### GA4 計測イベント一覧
+
+| イベント名 | 発火タイミング | 付与パラメータ |
+|---|---|---|
+| `page_view` | ページ読み込み時（自動） | — |
+| `start_diagnosis` | 「無料で診断する」ボタンクリック | utm_* |
+| `complete_diagnosis` | 結果画面表示時 | `result_type`, utm_* |
+| `cta_click` | CTAボタンクリック | `button_location`, utm_* |
+
+**`result_type` の値：**
+- `action_needed`（今すぐ動くタイプ）
+- `info_gathering`（情報収集タイプ）
+- `support_needed`（サポートが必要なタイプ）
+- `restart`（リスタートタイプ）
+
+**`button_location` の値：**
+- `result_main`（結果画面内CTAボタン）
+- `sticky`（画面下部固定ボタン）
+
+### UTMパラメータ（Threads流入追跡）
+
+Threadsプロフィールリンクに以下のUTMを付与することで、GA4で流入元を特定できます。
+
+```
+https://ren-os.github.io/threads-os/career-diagnosis/?utm_source=threads&utm_medium=profile&utm_campaign=career_diagnosis
+```
+
+UTMパラメータはsessionStorage経由で保持され、全イベントに付与されます。
+
+### 測定ID
+
+`G-R3JPL9E7TM`
+
+---
+
 ## 拡張予定（今後追加可能な機能）
 
 - `--ai-generate` オプションでClaude/GPTが投稿文を自動生成

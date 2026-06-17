@@ -3,6 +3,7 @@
  */
 
 import { calcResultType } from './diagnosis.js';
+import { initAnalytics, trackEvent } from './analytics.js';
 
 // ===========================
 // State
@@ -165,6 +166,9 @@ function showResult() {
     adviceList.appendChild(li);
   });
 
+  // GA4: 診断完了イベント
+  trackEvent('complete_diagnosis', { result_type: typeKey });
+
   setupCtaButtons();
   showScreen('screen-result');
 
@@ -178,8 +182,15 @@ function showResult() {
 function setupCtaButtons() {
   const lineUrl = 'https://lin.ee/WqfZFyd';
 
-  $('cta-btn').onclick = () => window.open(lineUrl, '_blank', 'noopener');
-  $('sticky-cta-btn').onclick = () => window.open(lineUrl, '_blank', 'noopener');
+  $('cta-btn').onclick = () => {
+    trackEvent('cta_click', { button_location: 'result_main' });
+    window.open(lineUrl, '_blank', 'noopener');
+  };
+
+  $('sticky-cta-btn').onclick = () => {
+    trackEvent('cta_click', { button_location: 'sticky' });
+    window.open(lineUrl, '_blank', 'noopener');
+  };
 }
 
 // ===========================
@@ -198,7 +209,12 @@ function retryDiagnosis() {
 async function init() {
   await loadData();
 
+  // GA4: UTMパラメータ保存
+  initAnalytics();
+
   $('start-btn').addEventListener('click', () => {
+    // GA4: 診断開始イベント
+    trackEvent('start_diagnosis');
     showScreen('screen-question');
     renderQuestion();
   });
