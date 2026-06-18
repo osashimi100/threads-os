@@ -383,25 +383,40 @@ def build_weekly_report(
 # ──────────────────────────────────────────────
 
 def generate_daily(target_date: str | None = None) -> None:
+    # API には GA4 ネイティブキーワード or YYYY-MM-DD を使う
     if target_date is None:
-        target_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        api_date     = "yesterday"
+        display_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        api_date     = target_date   # 呼び出し元が YYYY-MM-DD で渡す
+        display_date = target_date
+    print(f"[GA4] daily query: {api_date}")
     client        = _client()
-    counts        = fetch_event_totals(client, target_date, target_date)
-    campaign_rows = fetch_by_campaign(client, target_date, target_date)
-    report        = build_daily_report(counts, campaign_rows, target_date)
+    counts        = fetch_event_totals(client, api_date, api_date)
+    campaign_rows = fetch_by_campaign(client, api_date, api_date)
+    report        = build_daily_report(counts, campaign_rows, display_date)
     out           = ANALYSIS_DIR / "daily_report.md"
     out.write_text(report, encoding="utf-8")
     print(f"✅ 日次レポート生成: {out}")
 
 
 def generate_weekly(end_date: str | None = None) -> None:
+    # API には GA4 ネイティブキーワード or YYYY-MM-DD を使う
     if end_date is None:
-        end_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    start_date    = (datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=6)).strftime("%Y-%m-%d")
+        api_start     = "7daysAgo"
+        api_end       = "yesterday"
+        display_end   = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        display_start = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+    else:
+        api_end       = end_date     # 呼び出し元が YYYY-MM-DD で渡す
+        api_start     = (datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=6)).strftime("%Y-%m-%d")
+        display_end   = end_date
+        display_start = api_start
+    print(f"[GA4] weekly query: {api_start} → {api_end}")
     client        = _client()
-    daily_rows    = fetch_daily(client, start_date, end_date)
-    campaign_rows = fetch_by_campaign(client, start_date, end_date)
-    report        = build_weekly_report(daily_rows, campaign_rows, start_date, end_date)
+    daily_rows    = fetch_daily(client, api_start, api_end)
+    campaign_rows = fetch_by_campaign(client, api_start, api_end)
+    report        = build_weekly_report(daily_rows, campaign_rows, display_start, display_end)
     out           = ANALYSIS_DIR / "weekly_report.md"
     out.write_text(report, encoding="utf-8")
     print(f"✅ 週次レポート生成: {out}")
