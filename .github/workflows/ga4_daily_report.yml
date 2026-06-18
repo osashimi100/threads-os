@@ -43,6 +43,14 @@ jobs:
           mkdir -p config
           echo "$GA4_CREDENTIALS_JSON" > config/ga4_service_account.json
 
+      - name: Debug - show commit and script content
+        run: |
+          echo "=== Running commit: $(git rev-parse HEAD) ==="
+          echo "=== generate_daily code ==="
+          grep -A12 "def generate_daily" scripts/ga4_report.py
+          echo "=== generate_weekly code ==="
+          grep -A6 "def generate_weekly" scripts/ga4_report.py
+
       - name: Generate report
         env:
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
