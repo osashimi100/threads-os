@@ -189,7 +189,7 @@ def build_daily_report(
     cp = pivot_campaigns(campaign_rows)
 
     lines = [
-        f"# 日次レポート — {fmt_date(target_date)}",
+        f"# 日次レポート — {target_date}",
         "",
         "> 自動生成: `scripts/ga4_report.py`  |  測定ID: G-R3JPL9E7TM",
         "",
@@ -280,7 +280,7 @@ def build_weekly_report(
     cp = pivot_campaigns(campaign_rows)
 
     lines = [
-        f"# 週次レポート — {fmt_date(start)} 〜 {fmt_date(end)}",
+        f"# 週次レポート — {start} 〜 {end}",
         "",
         "> 自動生成: `scripts/ga4_report.py`  |  測定ID: G-R3JPL9E7TM",
         "",
@@ -384,7 +384,7 @@ def build_weekly_report(
 
 def generate_daily(target_date: str | None = None) -> None:
     if target_date is None:
-        target_date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        target_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     client        = _client()
     counts        = fetch_event_totals(client, target_date, target_date)
     campaign_rows = fetch_by_campaign(client, target_date, target_date)
@@ -396,8 +396,8 @@ def generate_daily(target_date: str | None = None) -> None:
 
 def generate_weekly(end_date: str | None = None) -> None:
     if end_date is None:
-        end_date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
-    start_date    = (datetime.strptime(end_date, "%Y%m%d") - timedelta(days=6)).strftime("%Y%m%d")
+        end_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    start_date    = (datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=6)).strftime("%Y-%m-%d")
     client        = _client()
     daily_rows    = fetch_daily(client, start_date, end_date)
     campaign_rows = fetch_by_campaign(client, start_date, end_date)
@@ -415,8 +415,8 @@ if __name__ == "__main__":
         choices=["daily", "weekly", "both"],
         default="both",
     )
-    parser.add_argument("--date",     help="日次の対象日 YYYYMMDD（省略=昨日）")
-    parser.add_argument("--end-date", help="週次の終了日 YYYYMMDD（省略=昨日）")
+    parser.add_argument("--date",     help="日次の対象日 YYYY-MM-DD（省略=昨日）")
+    parser.add_argument("--end-date", help="週次の終了日 YYYY-MM-DD（省略=昨日）")
     args = parser.parse_args()
 
     if args.mode in ("daily", "both"):
